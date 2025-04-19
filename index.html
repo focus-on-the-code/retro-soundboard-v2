@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retro Soundboard</title>
+  <style>
+    body {
+      background-color: #1e1e1e;
+      font-family: 'Arial', sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      width: 95%;
+      max-width: 1000px;
+      padding: 20px;
+      border: 5px solid #444;
+      border-radius: 20px;
+      background: #2a2a2a;
+      box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
+    }
+
+    .soundboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 20px;
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .upload-button {
+      background-color: #888;
+      color: black;
+      padding: 8px 16px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px #444;
+      transform: scale(0.85);
+    }
+
+    .upload-button:active {
+      box-shadow: 0 2px #222;
+      transform: translateY(2px) scale(0.85);
+    }
+
+    .sound-button {
+      width: 150px;
+      height: 150px;
+      background: linear-gradient(to bottom, #c00, #800);
+      border: 4px solid #333;
+      border-radius: 12px;
+      box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.5), 0 6px 12px rgba(0, 0, 0, 0.4);
+      color: #fff;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .sound-button:active {
+      transform: scale(0.98);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    .octagon-button {
+      width: 75px;
+      height: 75px;
+      background: linear-gradient(to bottom, #c00, #800);
+      clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+      border: 4px solid #333;
+      box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.5), 0 6px 12px rgba(0, 0, 0, 0.4);
+      color: #fff;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .octagon-button:active {
+      transform: scale(0.98);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    @media (max-width: 600px) {
+      .sound-button, .octagon-button {
+        width: 100px;
+        height: 100px;
+        font-size: 12px;
+      }
+
+      .upload-button {
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="soundboard">
+      <div class="button-group">
+        <input type="file" accept="audio/*" class="upload-input" style="display:none">
+        <div class="upload-button">Upload Sound</div>
+        <button class="sound-button">Sound 1</button>
+      </div>
+      <div class="button-group">
+        <div class="upload-button">Upload Sound</div>
+        <button class="sound-button">Sound 2</button>
+      </div>
+      <div class="button-group">
+        <div class="upload-button">Upload Sound</div>
+        <button class="sound-button">Sound 3</button>
+      </div>
+      <div class="button-group">
+        <div class="upload-button">Upload Sound</div>
+        <button class="sound-button">Sound 4</button>
+      </div>
+      <div class="button-group">
+        <div class="upload-button">Upload Sound</div>
+        <button class="sound-button">Sound 5</button>
+      </div>
+      <div class="button-group">
+        <div class="upload-button">Upload Sound</div>
+        <button class="sound-button">Sound 6</button>
+      </div>
+      <div class="button-group">
+        <div class="upload-button">Upload Sound</div>
+        <button class="sound-button">Sound 7</button>
+      </div>
+      <div class="button-group">
+        <div class="upload-button">Upload Sound</div>
+        <button class="sound-button">Sound 8</button>
+      </div>
+      <div class="button-group">
+        <div class="upload-button">Upload Sound</div>
+        <button class="sound-button">Sound 9</button>
+      </div>
+      <div class="button-group">
+        <button class="octagon-button" id="stop-button">STOP</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const buttonGroups = document.querySelectorAll('.button-group');
+    const audioList = [];
+
+    buttonGroups.forEach((group, index) => {
+      const uploadBtn = group.querySelector('.upload-button');
+      const soundBtn = group.querySelector('button');
+      let audio = null;
+
+      if (uploadBtn) {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'audio/*';
+        fileInput.style.display = 'none';
+        group.insertBefore(fileInput, uploadBtn);
+
+        uploadBtn.addEventListener('click', () => {
+          fileInput.click();
+        });
+
+        fileInput.addEventListener('change', () => {
+          if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            audio = new Audio(URL.createObjectURL(file));
+            soundBtn.textContent = file.name.slice(0, 15);
+            audioList[index] = audio;
+          }
+        });
+      }
+
+      soundBtn.addEventListener('click', () => {
+        if (soundBtn.id !== 'stop-button' && audio) {
+          audio.currentTime = 0;
+          audio.play();
+        }
+      });
+    });
+
+    const stopButton = document.getElementById('stop-button');
+    stopButton.addEventListener('click', () => {
+      audioList.forEach(audio => {
+        if (audio) {
+          audio.pause();
+          audio.currentTime = 0;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
